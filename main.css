@@ -2,7 +2,9 @@
     line-height: 30px;
     width: 150px;
 }
-
+.textGame {
+    color: white;
+}
 #gameDiv {
     font-family: Verdana, cursive;
     border: 3px solid;
@@ -13,9 +15,11 @@
 }
 #textPlayer {
     color: blue;
+    flex: 50%;
 }
 #textComputer {
     color: red;
+    flex: 50%;
 }
 #tombolReset {
     margin-top: 10px;
@@ -44,6 +48,12 @@
     z-index: -10;
     color: white;
     text-align: center;
+}
+
+#gerakan{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
 }
 
 @keyframes FadeIn {

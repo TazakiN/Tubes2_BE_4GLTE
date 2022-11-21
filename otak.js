@@ -20,8 +20,8 @@ tombolReset.addEventListener("click", () =>{
 tombolPilihan.forEach(button => button.addEventListener("click", () => {
     player = button.textContent;
     computerTurn();
-    textPlayer.textContent = `Player:   ${player}`;
-    textComputer.textContent = `Komputer:   ${computer}`;
+    textPlayer.textContent = player;
+    textComputer.textContent = computer;
     textHasil.textContent = cekPemenang();
     textSkor.textContent = setelSkor();
 }));
