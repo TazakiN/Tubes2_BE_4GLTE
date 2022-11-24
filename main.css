@@ -4,6 +4,7 @@
 }
 .textGame {
     color: white;
+    font-size: 7vh;
 }
 #gameDiv {
     font-family: Verdana, cursive;
@@ -12,6 +13,7 @@
     padding: 10px;
     background-color: lightgray;
     text-align: center;
+    margin-top: 5%;
 }
 #textPlayer {
     color: blue;
@@ -56,6 +58,9 @@
     gap: 2rem;
 }
 
+.GambarPilihan {
+    color: whitesmoke;
+}
 @keyframes FadeIn {
     to{
         opacity: 1;
