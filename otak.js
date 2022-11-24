@@ -1,10 +1,10 @@
 const textPlayer = document.querySelector("#textPlayer");
 const textComputer = document.querySelector("#textComputer");
 const textHasil = document.querySelector("#textHasil");
-const tombolPilihan = document.querySelectorAll(".tombolPilihan");
 const textSkor = document.querySelector("#textSkor")
 const splash = document.querySelector('.splash')
 const tombolReset = document.querySelector('#tombolReset')
+const gambarPilihan = document.querySelectorAll('.GambarPilihan')
 let player;
 let computer;
 let hasil;
@@ -17,8 +17,8 @@ tombolReset.addEventListener("click", () =>{
     textSkor.textContent = "0 : 0"
 })
 
-tombolPilihan.forEach(button => button.addEventListener("click", () => {
-    player = button.textContent;
+gambarPilihan.forEach(iconify => iconify.addEventListener("click", () => {
+    player = iconify.id;
     computerTurn();
     textPlayer.textContent = player;
     textComputer.textContent = computer;
