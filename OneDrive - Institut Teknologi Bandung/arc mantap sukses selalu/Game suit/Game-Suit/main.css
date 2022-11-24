@@ -1,0 +1,71 @@
+.tombolPilihan {
+    line-height: 30px;
+    width: 150px;
+}
+.textGame {
+    color: white;
+}
+#gameDiv {
+    font-family: Verdana, cursive;
+    border: 3px solid;
+    border-radius: 25px;
+    padding: 10px;
+    background-color: lightgray;
+    text-align: center;
+}
+#textPlayer {
+    color: blue;
+    flex: 50%;
+}
+#textComputer {
+    color: red;
+    flex: 50%;
+}
+#tombolReset {
+    margin-top: 10px;
+    margin-left: 40px;
+    width: 100px;
+    height: 30px;
+}
+
+.splash {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background: black;
+    z-index: 200;
+    color: white;
+    text-align: center;
+    line-height: 10vh;
+}
+.splash.display-none {
+    opacity: 0;
+    width: 100%;
+    height: 100vh;
+    background: black;
+    z-index: -10;
+    color: white;
+    text-align: center;
+}
+
+#gerakan{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+@keyframes FadeIn {
+    to{
+        opacity: 1;
+    }
+}
+.fade-in-pertama {
+    opacity: 0;
+    animation: FadeIn 1s ease-in forwards;
+}
+.fade-in-kedua {
+    opacity: 0;
+    animation: FadeIn 2s ease-in forwards;
+}
