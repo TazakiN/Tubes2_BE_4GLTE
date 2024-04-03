@@ -1,10 +1,30 @@
 package logic
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
-// IDS adalah fungsi yang digunakan untuk melakukan pencarian jalur terpendek dari linkMulai ke linkTujuan dengan menggunakan algoritma IDS
-func IDS(linkMulai string, linkTujuan string) {
-	fmt.Println("IDS")
+type Result struct {
+	Method     string `json:"method"`
+	LinkAwal   string `json:"linkAwal"`
+	LinkTujuan string `json:"linkTujuan"`
+}
+
+func IDS(linkMulai string, linkTujuan string) []string {
+	result := Result{
+		Method:     "IDS",
+		LinkAwal:   linkMulai,
+		LinkTujuan: linkTujuan,
+	}
+
+	// proses pencarian jalur di sini
+
+	jsonResult, err := json.Marshal(result)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil
+	}
+
+	return []string{string(jsonResult)}
 }

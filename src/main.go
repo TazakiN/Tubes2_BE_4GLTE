@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	logic "github.com/TazakiN/Tubes2_BE_4GLTE/logic"
 
@@ -16,15 +17,25 @@ func main() {
 }
 
 func getData(c *gin.Context) {
-	metode := c.Param("metode")
+	metode := strings.ToLower(c.Param("metode"))
 	linkMulai := c.Param("linkMulai")
 	linkTujuan := c.Param("linkTujuan")
+	hasil := []string{}
 
 	if metode == "bfs" {
-		logic.BFS(linkMulai, linkTujuan)
+		hasil = logic.BFS(linkMulai, linkTujuan)
 	} else if metode == "ids" {
-		logic.IDS(linkMulai, linkTujuan)
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Metode tidak ditemukan"})
+		hasil = logic.IDS(linkMulai, linkTujuan)
 	}
+
+	if metode != "bfs" && metode != "ids" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Terjadi kesalahan",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"hasil": hasil,
+	})
 }

@@ -1,10 +1,24 @@
 package logic
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
-// BFS adalah fungsi yang digunakan untuk melakukan pencarian jalur terpendek dari linkMulai ke linkTujuan dengan menggunakan algoritma BFS
-func BFS(linkMulai string, linkTujuan string) {
-	fmt.Println("BFS")
+func BFS(linkMulai string, linkTujuan string) []string {
+	result := Result{
+		Method:     "BFS",
+		LinkAwal:   linkMulai,
+		LinkTujuan: linkTujuan,
+	}
+
+	// proses pencarian jalur di sini
+
+	jsonResult, err := json.Marshal(result)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil
+	}
+
+	return []string{string(jsonResult)}
 }
