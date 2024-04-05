@@ -35,8 +35,8 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) []string {
 			link := aTag["link"]
 			title := aTag["title"]
 
-			if titleVisited[link] {
-				continue // Skip link yang sudah dikunjungi
+			if titleVisited[title] {
+				continue
 			}
 
 			if title == titleTujuan {
