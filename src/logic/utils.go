@@ -7,21 +7,29 @@ import (
 type Node struct {
 	// visited    bool
 	link       string
+	title      string
 	neighbours []*Node
-	distance   int
 	parent     *Node
 }
 
-func newNode(link string) *Node {
+func newNode(link string, title string) *Node {
 	return &Node{
-		link: link,
 		// visited:    false,
+		link:       link,
+		title:      title,
 		neighbours: []*Node{},
-		distance:   0,
 		parent:     nil,
 	}
 }
 
 func (n *Node) String() string {
 	return fmt.Sprintf("[%s]", getPageTitle(n.link))
+}
+
+func reverse(s []string) []string {
+	for i := 0; i < len(s)/2; i++ {
+		j := len(s) - i - 1
+		s[i], s[j] = s[j], s[i]
+	}
+	return s
 }
