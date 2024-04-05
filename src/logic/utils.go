@@ -5,8 +5,8 @@ import (
 )
 
 type Node struct {
+	// visited    bool
 	link       string
-	visited    bool
 	neighbours []*Node
 	distance   int
 	parent     *Node
@@ -14,8 +14,8 @@ type Node struct {
 
 func newNode(link string) *Node {
 	return &Node{
-		link:       link,
-		visited:    false,
+		link: link,
+		// visited:    false,
 		neighbours: []*Node{},
 		distance:   0,
 		parent:     nil,
@@ -25,12 +25,3 @@ func newNode(link string) *Node {
 func (n *Node) String() string {
 	return fmt.Sprintf("[%s]", getPageTitle(n.link))
 }
-
-// func muatHasil(node *Node) []string {
-// 	hasil := []string{}
-// 	for node != nil {
-// 		hasil = append(hasil, getPageTitle(node.link))
-// 		node = node.parent
-// 	}
-// 	return hasil
-// }
