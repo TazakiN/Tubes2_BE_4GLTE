@@ -12,19 +12,34 @@ const pathUtamaIndo = "https://id.wikipedia.org/wiki/"
 
 const pathUtamaInggris = "https://en.wikipedia.org/wiki/"
 
-func getAllATag(url string) []string {
-	// fmt.Println("Visiting", url)
+func getAllATag(url string) []map[string]string {
 
 	c := colly.NewCollector()
 
-	links := []string{}
+	links := []map[string]string{}
 
-	c.OnHTML("div.mw-body-content p a", func(e *colly.HTMLElement) {
+	c.OnHTML("div.mw-body-content a[href*='/wiki/'][title]", func(e *colly.HTMLElement) {
 		href := e.Attr("href")
+		title := e.Attr("title")
+
+		if !strings.HasPrefix(href, "/wiki/") {
+			return // skip yang gapunya /wiki/
+		}
+
+		if strings.Contains(href, "Berkas:") || strings.Contains(title, "Templat:") {
+			return // skip yang berkas dan yang isinya templat
+		}
+
+		if title == "" {
+			return // skip yang gapunya title
+		}
+
 		if strings.HasPrefix(href, "/wiki/") {
-			// Cetak judul halaman Wikipedia
-			// fmt.Println(e.Text, "->", pathUtamaIndo+href)
-			links = append(links, strings.TrimPrefix(href, "/wiki/"))
+			link := map[string]string{
+				"link":  strings.TrimPrefix(href, "/wiki/"),
+				"title": title,
+			}
+			links = append(links, link)
 		}
 	})
 
