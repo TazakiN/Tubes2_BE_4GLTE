@@ -12,12 +12,13 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.GET("/:metode/:linkMulai/:linkTujuan", getData)
+	router.GET("/:bahasa/:metode/:linkMulai/:linkTujuan", getData)
 
 	router.Run("localhost:3321")
 }
 
 func getData(c *gin.Context) {
+	bahasa := c.Param("bahasa")
 	metode := strings.ToLower(c.Param("metode"))
 	linkMulai := c.Param("linkMulai")
 	linkTujuan := c.Param("linkTujuan")
@@ -25,9 +26,9 @@ func getData(c *gin.Context) {
 
 	startTime := time.Now()
 	if metode == "bfs" {
-		hasil = logic.BFS(linkMulai, linkTujuan)
+		hasil = logic.BFS(linkMulai, linkTujuan, bahasa)
 	} else if metode == "ids" {
-		hasil = logic.IDS(linkMulai, linkTujuan)
+		hasil = logic.IDS(linkMulai, linkTujuan, bahasa)
 	}
 	endTime := time.Now()
 	elapseTime := endTime.Sub(startTime).String()
