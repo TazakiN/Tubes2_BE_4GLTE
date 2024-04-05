@@ -2,9 +2,12 @@ package logic
 
 func BFS(linkMulai string, linkTujuan string, bahasa string) []string {
 	queue := []*Node{}
-	start := newNode(linkMulai)
+	titleMulai := getPageTitle(linkMulai)
+	start := newNode(linkMulai, titleMulai)
 	hasil := []string{}
 	titleVisited := make(map[string]bool)
+	node := &Node{}
+	found := false
 
 	if bahasa == "id" {
 		pathUtama = pathUtamaIndo
@@ -15,29 +18,51 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) []string {
 	titleTujuan := getPageTitle(linkTujuan)
 
 	queue = append(queue, start)
-	for len(queue) > 0 {
+	titleVisited[titleMulai] = true
+
+	if titleMulai == titleTujuan {
+		return append(hasil, titleMulai)
+	}
+
+	for len(queue) > 0 && !found {
 		current := queue[0]
+		// fmt.Println("visiting", current.title, "di link", current.link)
 		queue = queue[1:]
-		titleCurrent := getPageTitle(current.link)
 
-		if titleCurrent == titleTujuan {
-			for current != nil {
-				hasil = append(hasil, getPageTitle(current.link))
-				current = current.parent
+		aTags := getAllATag(current.link) // berisi map link dan title
+
+		for _, aTag := range aTags {
+			link := aTag["link"]
+			title := aTag["title"]
+
+			if titleVisited[link] {
+				continue // Skip link yang sudah dikunjungi
 			}
-			break
-		}
 
-		neighbours := getAllATag(current.link)
-		for _, neighbourLink := range neighbours {
-			if !titleVisited[neighbourLink] {
-				neighbour := newNode(neighbourLink)
-				neighbour.distance = current.distance + 1
+			if title == titleTujuan {
+				node = newNode(link, title)
+				node.parent = current
+
+				found = true
+				break
+			}
+
+			if !titleVisited[title] {
+				titleVisited[title] = true
+				neighbour := newNode(link, title)
 				neighbour.parent = current
+				current.neighbours = append(current.neighbours, neighbour)
 				queue = append(queue, neighbour)
-				titleVisited[neighbourLink] = true
 			}
 		}
+	}
+
+	if found {
+		for node != nil {
+			hasil = append(hasil, node.title)
+			node = node.parent
+		}
+		hasil = reverse(hasil)
 	}
 	return hasil
 }
