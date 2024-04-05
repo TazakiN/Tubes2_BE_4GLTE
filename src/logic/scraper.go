@@ -6,9 +6,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
+var pathUtama string
+
 const pathUtamaIndo = "https://id.wikipedia.org/wiki/"
 
-// const pathUtamaInggris = "https://en.wikipedia.org"
+const pathUtamaInggris = "https://en.wikipedia.org/wiki/"
 
 func getAllATag(url string) []string {
 	// fmt.Println("Visiting", url)
@@ -26,7 +28,7 @@ func getAllATag(url string) []string {
 		}
 	})
 
-	c.Visit(pathUtamaIndo + url)
+	c.Visit(pathUtama + url)
 
 	return links
 }
@@ -40,7 +42,8 @@ func getPageTitle(url string) string {
 		title = e.Text
 	})
 
-	c.Visit(pathUtamaIndo + url)
+	c.Visit(pathUtama + url)
+	// fmt.Println("sedang mengunjungi", pathUtama+url, "dengan judul", title)
 
 	return title
 }
