@@ -11,7 +11,7 @@ type Result struct {
 	LinkTujuan string `json:"linkTujuan"`
 }
 
-func IDS(linkMulai string, linkTujuan string, bahasa string) []string {
+func IDS(linkMulai string, linkTujuan string, bahasa string) [][]string {
 	result := Result{
 		Method:     "IDS",
 		LinkAwal:   linkMulai,
@@ -26,5 +26,7 @@ func IDS(linkMulai string, linkTujuan string, bahasa string) []string {
 		return nil
 	}
 
-	return []string{string(jsonResult)}
+	fmt.Println(string(jsonResult))
+
+	return nil
 }
