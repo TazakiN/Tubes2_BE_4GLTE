@@ -26,8 +26,8 @@ func getAllATag(url string) []map[string]string {
 			return // skip yang gapunya /wiki/
 		}
 
-		if strings.Contains(href, "Berkas:") || strings.Contains(title, "Templat:") {
-			return // skip yang berkas dan yang isinya templat
+		if strings.Contains(href, "Berkas:") || strings.Contains(title, "Templat:") || strings.Contains(href, "Istimewa:") || strings.Contains(href, "Portal:") {
+			return // skip berkas, templat, istimewa, portal
 		}
 
 		if title == "" {
@@ -58,7 +58,6 @@ func getPageTitle(url string) string {
 	})
 
 	c.Visit(pathUtama + url)
-	// fmt.Println("sedang mengunjungi", pathUtama+url, "dengan judul", title)
 
 	return title
 }

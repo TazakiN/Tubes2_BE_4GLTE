@@ -5,20 +5,16 @@ import (
 )
 
 type Node struct {
-	// visited    bool
-	link       string
-	title      string
-	neighbours []*Node
-	parent     *Node
+	link   string
+	title  string
+	parent *Node
 }
 
 func newNode(link string, title string) *Node {
 	return &Node{
-		// visited:    false,
-		link:       link,
-		title:      title,
-		neighbours: []*Node{},
-		parent:     nil,
+		link:   link,
+		title:  title,
+		parent: nil,
 	}
 }
 
@@ -32,4 +28,13 @@ func reverse(s []string) []string {
 		s[i], s[j] = s[j], s[i]
 	}
 	return s
+}
+
+func getPath(node *Node) []string {
+	path := []string{}
+	for node != nil {
+		path = append(path, node.link)
+		node = node.parent
+	}
+	return reverse(path)
 }
