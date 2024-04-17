@@ -28,7 +28,7 @@ func getData(c *gin.Context) {
 	metode := c.Param("metode")
 	linkMulai := c.Param("linkMulai")
 	linkTujuan := c.Param("linkTujuan")
-	hasil := []string{}
+	hasil := [][]string{}
 
 	startTime := time.Now()
 	if metode == "BFS" {
@@ -47,8 +47,8 @@ func getData(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"hasil":          hasil,
-		"panjang solusi": len(hasil) - 1, // asumsi link awal ga dihitung
-		"waktu":          elapseTime,
+		"hasil":   hasil,
+		"panjang": len(hasil[0]),
+		"waktu":   elapseTime,
 	})
 }
