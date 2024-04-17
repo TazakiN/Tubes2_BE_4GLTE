@@ -1,35 +1,42 @@
 package logic
 
-func BFS(linkMulai string, linkTujuan string, bahasa string) []string {
-	queue := []*Node{}
+import (
+	"math"
+	"math/rand"
+	"sync"
+	"time"
+)
+
+func BFS(linkMulai string, linkTujuan string, bahasa string) [][]string {
+	queue := make(chan *Node, int(math.Pow(2, 24)))
 	titleMulai := getPageTitle(linkMulai)
 	start := newNode(linkMulai, titleMulai)
-	hasil := []string{}
+	hasil := [][]string{}
 	titleVisited := make(map[string]bool)
-	node := &Node{}
+	listHasil := []*Node{}
 	found := false
 
-	if bahasa == "id" {
+	if bahasa == "ID" {
 		pathUtama = pathUtamaIndo
-	} else if bahasa == "en" {
+	} else if bahasa == "EN" {
 		pathUtama = pathUtamaInggris
 	}
 
 	titleTujuan := getPageTitle(linkTujuan)
 
-	queue = append(queue, start)
+	queue <- start
 	titleVisited[titleMulai] = true
 
 	if titleMulai == titleTujuan {
-		return append(hasil, titleMulai)
+		return append(hasil, []string{linkMulai})
 	}
 
+	var wg sync.WaitGroup
 	for len(queue) > 0 && !found {
-		current := queue[0]
-		// fmt.Println("visiting", current.title, "di link", current.link)
-		queue = queue[1:]
+		banyakNode := len(queue)
+		node := <-queue
 
-		aTags := getAllATag(current.link) // berisi map link dan title
+		aTags := getAllATag(node.link) // berisi map link dan title
 
 		for _, aTag := range aTags {
 			link := aTag["link"]
@@ -40,29 +47,32 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) []string {
 			}
 
 			if title == titleTujuan {
-				node = newNode(link, title)
-				node.parent = current
-
+				nodeAkhir := newNode(link, title)
+				nodeAkhir.parent = node
+				listHasil = append(listHasil, nodeAkhir)
 				found = true
-				break
 			}
 
 			if !titleVisited[title] {
 				titleVisited[title] = true
-				neighbour := newNode(link, title)
-				neighbour.parent = current
-				current.neighbours = append(current.neighbours, neighbour)
-				queue = append(queue, neighbour)
+				if !found {
+					wg.Add(1)
+					go func(n *Node) {
+						defer wg.Done()
+						n.parent = node
+						queue <- n
+					}(newNode(link, title))
+					time.Sleep(time.Duration(rand.Intn(170)) * time.Microsecond)
+				}
 			}
 		}
+		time.Sleep(time.Duration(300) * time.Microsecond * time.Duration(banyakNode))
+		wg.Wait()
 	}
 
-	if found {
-		for node != nil {
-			hasil = append(hasil, node.title)
-			node = node.parent
-		}
-		hasil = reverse(hasil)
+	for i := len(listHasil) - 1; i >= 0; i-- {
+		hasil = append(hasil, getPath(listHasil[i]))
 	}
+
 	return hasil
 }
