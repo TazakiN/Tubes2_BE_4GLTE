@@ -3,7 +3,9 @@ package logic
 import (
 	"fmt"
 	"math"
+	"math/rand/v2"
 	"sync"
+	"time"
 )
 
 // SafeTitleVisited is a thread-safe map to keep track of visited titles
@@ -128,13 +130,13 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 		fmt.Printf("Length of queue now: %d\n", len(queue))
 		fmt.Printf("Found? %t\n", found)
 
+		time.Sleep(time.Duration(rand.IntN(21)) * time.Millisecond)
 		// Increment the WaitGroup counter
 		wg.Add(1)
 		// Process each node concurrently using a goroutine
 		go func(nodeToProcess *Node) {
 			// Decrement the WaitGroup counter when the goroutine finishes
 			defer wg.Done()
-
 			// Get all <a> tags from the node's link
 			aTags := getAllATag(nodeToProcess.link)
 
