@@ -10,10 +10,26 @@ type Node struct {
 	parent *Node
 }
 
+type NodeIDS struct {
+	link   string
+	title  string
+	depth  int
+	parent *NodeIDS
+}
+
 func newNode(link string, title string) *Node {
 	return &Node{
 		link:   link,
 		title:  title,
+		parent: nil,
+	}
+}
+
+func newNodeIDS(link string, title string, depth int) *NodeIDS {
+	return &NodeIDS{
+		link:   link,
+		title:  title,
+		depth:  depth,
 		parent: nil,
 	}
 }
@@ -31,6 +47,15 @@ func reverse(s []string) []string {
 }
 
 func getPath(node *Node) []string {
+	path := []string{}
+	for node != nil {
+		path = append(path, node.link)
+		node = node.parent
+	}
+	return reverse(path)
+}
+
+func getPathIDS(node *NodeIDS) []string {
 	path := []string{}
 	for node != nil {
 		path = append(path, node.link)

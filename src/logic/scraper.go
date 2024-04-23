@@ -49,6 +49,10 @@ func getAllATag(url string) []map[string]string {
 			return // skip berkas, templat, istimewa, portal, bantuan, kategori, wikipedia:
 		}
 
+		if strings.Contains(href, "File:") || strings.Contains(title, "Template:") || strings.Contains(href, "Special:") || strings.Contains(href, "Portal:") || strings.Contains(href, "Bantuan:") || strings.Contains(href, "Category:") {
+			return // skip berkas, templat, istimewa, portal, bantuan, kategori, wikipedia:
+		}
+
 		if title == "" {
 			return // skip yang gapunya title
 		}
