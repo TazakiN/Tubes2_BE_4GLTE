@@ -29,10 +29,11 @@ func getData(c *gin.Context) {
 	linkMulai := c.Param("linkMulai")
 	linkTujuan := c.Param("linkTujuan")
 	hasil := [][]string{}
+	visit := [][]string{}
 
 	startTime := time.Now()
 	if metode == "BFS" {
-		hasil = logic.BFS(linkMulai, linkTujuan, bahasa)
+		hasil, visit = logic.BFS(linkMulai, linkTujuan, bahasa)
 	} else if metode == "IDS" {
 		hasil = logic.IDS(linkMulai, linkTujuan, bahasa)
 	}
@@ -46,9 +47,15 @@ func getData(c *gin.Context) {
 		return
 	}
 
+	panjang := 0
+	if len(hasil) > 0 {
+		panjang = len(hasil[0])
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"hasil":   hasil,
-		"panjang": len(hasil[0]),
+		"visit":   visit,
+		"panjang": panjang,
 		"waktu":   elapseTime,
 	})
 }

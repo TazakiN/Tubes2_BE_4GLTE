@@ -1,6 +1,7 @@
 package logic
 
 import (
+	//"fmt"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -12,7 +13,25 @@ const pathUtamaIndo = "https://id.wikipedia.org/wiki/"
 
 const pathUtamaInggris = "https://en.wikipedia.org/wiki/"
 
+func getPageTitle(url string) string {
+	c := colly.NewCollector()
+
+	title := ""
+
+	c.OnHTML("span.mw-page-title-main", func(e *colly.HTMLElement) {
+		title = e.Text
+	})
+
+	c.Visit(pathUtama + url)
+
+	return title
+}
+
+// var collyMutex sync.Mutex
+
 func getAllATag(url string) []map[string]string {
+	// collyMutex.Lock()
+	// defer collyMutex.Unlock()
 
 	c := colly.NewCollector()
 
@@ -26,8 +45,8 @@ func getAllATag(url string) []map[string]string {
 			return // skip yang gapunya /wiki/
 		}
 
-		if strings.Contains(href, "Berkas:") || strings.Contains(title, "Templat:") || strings.Contains(href, "Istimewa:") || strings.Contains(href, "Portal:") {
-			return // skip berkas, templat, istimewa, portal
+		if strings.Contains(href, "Berkas:") || strings.Contains(title, "Templat:") || strings.Contains(href, "Istimewa:") || strings.Contains(href, "Portal:") || strings.Contains(href, "Bantuan:") || strings.Contains(href, "Kategori:") || strings.Contains(href, "Wikipedia:") {
+			return // skip berkas, templat, istimewa, portal, bantuan, kategori, wikipedia:
 		}
 
 		if title == "" {
@@ -46,18 +65,4 @@ func getAllATag(url string) []map[string]string {
 	c.Visit(pathUtama + url)
 
 	return links
-}
-
-func getPageTitle(url string) string {
-	c := colly.NewCollector()
-
-	title := ""
-
-	c.OnHTML("span.mw-page-title-main", func(e *colly.HTMLElement) {
-		title = e.Text
-	})
-
-	c.Visit(pathUtama + url)
-
-	return title
 }
