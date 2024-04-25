@@ -45,7 +45,6 @@ func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) [][]string
 
 	// Create a slice to store the result
 	hasil := [][]string{}
-	visit := [][]string{}
 
 	// Create a map to keep track of visited titles
 	titleVisited := NewSafeTitleVisited()
@@ -81,8 +80,6 @@ func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) [][]string
 		if titleVisited.HasVisited(title) {
 			continue
 		}
-
-		visit = append(visit, []string{title})
 
 		// Check if the destination title is found
 		if title == titleTujuan {
