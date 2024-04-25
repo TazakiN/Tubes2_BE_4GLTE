@@ -108,8 +108,8 @@ func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) ([][]strin
 
 func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]string, [][]string) {
 	// Create channels for results
-	resultChan := make(chan [][]string)
-	visitChan := make(chan [][]string)
+	//resultChan := make(chan [][]string)
+	//visitChan := make(chan [][]string)
 
 	// Create a stack for the queue
 	queue := make(chan *NodeIDS, int(math.Pow(2, 24)))
@@ -171,20 +171,19 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 		fmt.Printf("Depth %d\n", depth)
 
 		// Check if depth limit is reached
-		if node.depth == depth {
+		if node.depth > depth {
 			fmt.Println("error sini")
 			continue // Skip expanding this node further
 		}
 
-		time.Sleep(time.Duration(rand.IntN(700)) * time.Millisecond)
+		time.Sleep(time.Duration(rand.IntN(21)) * time.Millisecond)
 
 		wg.Add(1)
 		go func(nodeToProcess *NodeIDS) {
 			// Decrement the WaitGroup counter when the goroutine finishes
 			defer wg.Done()
 
-			var localHasil [][]string
-			var localVisit [][]string
+			//var localHasil [][]string
 
 			// Get all <a> tags from the node's link
 			aTags := getAllATag(nodeToProcess.link)
@@ -203,8 +202,7 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 					continue
 				}
 
-				// Append the title to the visit list
-				localVisit = append(localVisit, []string{title})
+				visit = append(visit, []string{node.title})
 
 				// Check if the destination title is found
 				if title == titleTujuan {
@@ -214,9 +212,7 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 
 					// Append the destination node to the list of result nodes
 					// Append the destination node to the list of result nodes
-					localHasil = append(localHasil, getPathIDS(nodeAkhir))
-					visitChan <- localVisit
-					resultChan <- localHasil
+					hasil = append(hasil, getPathIDS(nodeAkhir))
 
 					found = true
 
@@ -241,17 +237,12 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 	wg.Wait()
 
 	fmt.Println("ga di wait")
-
 	// Receive results from channels if found
-	if found {
-		for res := range resultChan {
-			hasil = append(hasil, res...)
-		}
-
-		for vis := range visitChan {
-			visit = append(visit, vis...)
-		}
-	}
+	// if found {
+	// 	for res := range resultChan {
+	// 		hasil = append(hasil, res...)
+	// 	}
+	// }
 
 	// Return empty result if destination not found within depth limit
 	return hasil, visit
