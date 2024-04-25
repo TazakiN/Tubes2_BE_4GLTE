@@ -8,35 +8,8 @@ import (
 	"time"
 )
 
-// SafeTitleVisited is a thread-safe map to keep track of visited titles
-type SafeTitleVisited struct {
-	mu     sync.Mutex
-	titles map[string]bool
-}
-
-// NewSafeTitleVisited creates a new instance of SafeTitleVisited
-func NewSafeTitleVisited() *SafeTitleVisited {
-	return &SafeTitleVisited{
-		titles: make(map[string]bool),
-	}
-}
-
-// MarkVisited marks a title as visited
-func (stv *SafeTitleVisited) MarkVisited(title string) {
-	stv.mu.Lock()
-	defer stv.mu.Unlock()
-	stv.titles[title] = true
-}
-
-// HasVisited checks if a title has been visited
-func (stv *SafeTitleVisited) HasVisited(title string) bool {
-	stv.mu.Lock()
-	defer stv.mu.Unlock()
-	return stv.titles[title]
-}
-
 // BFS performs a breadth-first search to find paths between two Wikipedia pages.
-func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]string) {
+func BFS(linkMulai string, linkTujuan string, bahasa string) [][]string {
 	// Create a channel for the queue
 	queue := make(chan *Node, int(math.Pow(2, 24)))
 
@@ -48,7 +21,6 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 
 	// Create a slice to store the result
 	hasil := [][]string{}
-	visit := [][]string{}
 
 	// Create a map to keep track of visited titles
 	titleVisited := NewSafeTitleVisited()
@@ -76,7 +48,7 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 
 	// If the starting and destination titles are the same, return the link
 	if titleMulai == titleTujuan {
-		return append(hasil, []string{linkMulai}), visit
+		return append(hasil, []string{linkMulai})
 	}
 
 	//Process main page
@@ -91,8 +63,6 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 	for _, aTag := range aTags {
 		link := aTag["link"]
 		title := aTag["title"]
-
-		visit = append(visit, []string{title})
 
 		// Check if the title has been visited before
 		if titleVisited.HasVisited(title) {
@@ -120,7 +90,6 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 	}
 
 	//Process queue if not found on main page
-	//var mutex sync.Mutex
 	var wg sync.WaitGroup
 	// Loop until the queue is empty or the destination is found
 	for len(queue) > 0 && !found {
@@ -137,6 +106,7 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 		go func(nodeToProcess *Node) {
 			// Decrement the WaitGroup counter when the goroutine finishes
 			defer wg.Done()
+
 			// Get all <a> tags from the node's link
 			aTags := getAllATag(nodeToProcess.link)
 
@@ -148,9 +118,6 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 				if found {
 					break
 				}
-
-				// Append the title to the visit list
-				visit = append(visit, []string{title})
 
 				// Check if the title has been visited before
 				if titleVisited.HasVisited(title) {
@@ -202,7 +169,7 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]st
 	}
 
 	// Return the result
-	return hasil, visit
+	return hasil
 }
 
 //19:33 23/04/2024

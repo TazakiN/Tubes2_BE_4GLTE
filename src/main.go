@@ -36,7 +36,7 @@ func getData(c *gin.Context) {
 
 	startTime := time.Now()
 	if metode == "BFS" {
-		hasil, visit = logic.BFS(linkMulai, linkTujuan, bahasa)
+		hasil = logic.BFS(linkMulai, linkTujuan, bahasa)
 	} else if metode == "IDS" {
 		hasil, visit = logic.IDS(linkMulai, linkTujuan, bahasa, kedalaman)
 	}

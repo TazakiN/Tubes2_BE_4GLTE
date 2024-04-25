@@ -4,6 +4,9 @@ import (
 	//"encoding/json"
 	"fmt"
 	"math"
+	"math/rand/v2"
+	"sync"
+	"time"
 )
 
 func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) ([][]string, [][]string) {
@@ -11,8 +14,16 @@ func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) ([][]
 	hasil := [][]string{}
 	visit := [][]string{}
 
+	//Check starting page
+	hasil, visit = DLSLevelZero(linkMulai, linkTujuan, bahasa)
+
+	// If the destination is found, return the result
+	if len(hasil) > 0 {
+		return hasil, visit
+	}
+
 	// Loop through increasing depth limits
-	for depth := 0; depth <= maxDepth; depth++ {
+	for depth := 1; depth <= maxDepth; depth++ {
 		// Perform depth-limited search with current depth limit
 		hasil, visit = DLS(linkMulai, linkTujuan, bahasa, depth)
 
@@ -23,18 +34,15 @@ func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) ([][]
 	}
 
 	// Return empty result if destination not found within max depth
+	fmt.Println("Not found! Try searching deeper")
 	return hasil, visit
 }
 
-func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]string, [][]string) {
-	// Create a stack for the queue
-	queue := make(chan *NodeIDS, int(math.Pow(2, 24)))
-
+func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]string) {
 	// Get the title of the starting page
 	titleMulai := getPageTitle(linkMulai)
 
-	// Create the starting node
-	start := newNodeIDS(linkMulai, titleMulai, 0) // Add depth parameter to newNode
+	start := newNodeIDS(linkMulai, titleMulai, 0)
 
 	// Create a slice to store the result
 	hasil := [][]string{}
@@ -56,9 +64,6 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 	// Get the title of the destination page
 	titleTujuan := getPageTitle(linkTujuan)
 
-	// Enqueue the starting node
-	queue <- start
-
 	titleVisited.MarkVisited(titleMulai)
 
 	// If the starting and destination titles are the same, return the link
@@ -66,56 +71,185 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 		return append(hasil, []string{linkMulai}), visit
 	}
 
+	aTags := getAllATag(start.link)
+
+	// Iterate over each <a> tag
+	for _, aTag := range aTags {
+		link := aTag["link"]
+		title := aTag["title"]
+
+		// Check if the title has been visited before
+		if titleVisited.HasVisited(title) {
+			continue
+		}
+
+		visit = append(visit, []string{title})
+
+		// Check if the destination title is found
+		if title == titleTujuan {
+			nodeAkhir := newNodeIDS(link, title, start.depth+1)
+			nodeAkhir.parent = start
+			listHasil = append(listHasil, nodeAkhir)
+			break
+		}
+
+		// Mark the title as visited
+		titleVisited.MarkVisited(title)
+	}
+
+	// Generate the path from the result nodes
+	for i := len(listHasil) - 1; i >= 0; i-- {
+		hasil = append(hasil, getPathIDS(listHasil[i]))
+	}
+
+	// Return the result
+	return hasil, visit
+}
+
+func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]string, [][]string) {
+	// Create channels for results
+	resultChan := make(chan [][]string)
+	visitChan := make(chan [][]string)
+
+	// Create a stack for the queue
+	queue := make(chan *NodeIDS, int(math.Pow(2, 24)))
+
+	// Get the title of the starting page
+	titleMulai := getPageTitle(linkMulai)
+
+	// Create the starting node
+	start := newNodeIDS(linkMulai, titleMulai, 0)
+
+	// Create a slice to store the result
+	hasil := [][]string{}
+	visit := [][]string{}
+
+	// Create a map to keep track of visited titles
+	titleVisited := NewSafeTitleVisited()
+
+	// Determine the path based on the language
+	if bahasa == "ID" {
+		pathUtama = pathUtamaIndo
+	} else if bahasa == "EN" {
+		pathUtama = pathUtamaInggris
+	}
+
+	// Get the title of the destination page
+	titleTujuan := getPageTitle(linkTujuan)
+
+	// Queue all <a> tags from starting page
+	aTags := getAllATag(start.link)
+
+	// Iterate over each <a> tag
+	for _, aTag := range aTags {
+		link := aTag["link"]
+		title := aTag["title"]
+
+		// Check if the title has been visited before
+		if titleVisited.HasVisited(title) {
+			continue
+		}
+
+		// Mark the title as visited
+		titleVisited.MarkVisited(title)
+
+		n := newNodeIDS(link, title, start.depth+1)
+		n.parent = start
+		queue <- n
+	}
+
+	found := false
+
+	var wg sync.WaitGroup
 	// Process stack until empty or depth limit is reached
 	for len(queue) > 0 {
 		// Dequeue a node from the stack
 		node := <-queue
 		fmt.Println("Title visited: " + node.title)
+		fmt.Printf("Length of queue now: %d\n", len(queue))
+		fmt.Printf("Found? %t\n", found)
+		fmt.Printf("Depth %d\n", depth)
 
 		// Check if depth limit is reached
 		if node.depth == depth {
+			fmt.Println("error sini")
 			continue // Skip expanding this node further
 		}
 
-		// Get all <a> tags from the node's link
-		aTags := getAllATag(node.link)
+		time.Sleep(time.Duration(rand.IntN(700)) * time.Millisecond)
 
-		// Iterate over each <a> tag
-		for _, aTag := range aTags {
-			link := aTag["link"]
-			title := aTag["title"]
+		wg.Add(1)
+		go func(nodeToProcess *NodeIDS) {
+			// Decrement the WaitGroup counter when the goroutine finishes
+			defer wg.Done()
 
-			// Append the title to the visit list
-			visit = append(visit, []string{title})
+			var localHasil [][]string
+			var localVisit [][]string
 
-			// Check if the title has been visited before
-			if titleVisited.HasVisited(title) {
-				continue
-			}
+			// Get all <a> tags from the node's link
+			aTags := getAllATag(nodeToProcess.link)
 
-			// Check if the destination title is found
-			if title == titleTujuan {
-				// Create a new node for the destination
-				nodeAkhir := newNodeIDS(link, title, node.depth+1) // Increment depth
-				nodeAkhir.parent = node
+			// Iterate over each <a> tag
+			for _, aTag := range aTags {
+				link := aTag["link"]
+				title := aTag["title"]
 
-				// Append the destination node to the list of result nodes
-				listHasil = append(listHasil, nodeAkhir)
-
-				// Return the result
-				for i := len(listHasil) - 1; i >= 0; i-- {
-					hasil = append(hasil, getPathIDS(listHasil[i]))
+				if found {
+					break
 				}
-				return hasil, visit
+
+				// Check if the title has been visited before
+				if titleVisited.HasVisited(title) {
+					continue
+				}
+
+				// Append the title to the visit list
+				localVisit = append(localVisit, []string{title})
+
+				// Check if the destination title is found
+				if title == titleTujuan {
+					// Create a new node for the destination
+					nodeAkhir := newNodeIDS(link, title, nodeToProcess.depth+1) // Increment depth
+					nodeAkhir.parent = nodeToProcess
+
+					// Append the destination node to the list of result nodes
+					// Append the destination node to the list of result nodes
+					localHasil = append(localHasil, getPathIDS(nodeAkhir))
+					visitChan <- localVisit
+					resultChan <- localHasil
+
+					found = true
+
+					break
+				}
+
+				// Mark the title as visited
+				titleVisited.MarkVisited(title)
+
+				if !found {
+					// Enqueue the new node
+					n := newNodeIDS(link, title, nodeToProcess.depth+1) // Increment depth
+					n.parent = nodeToProcess
+					queue <- n
+				}
 			}
+		}(node)
+	}
 
-			// Mark the title as visited
-			titleVisited.MarkVisited(title)
+	fmt.Println("stuck di wait")
+	// Wait for all goroutines to finish
+	wg.Wait()
 
-			// Enqueue the new node
-			n := newNodeIDS(link, title, node.depth+1) // Increment depth
-			n.parent = node
-			queue <- n
+	fmt.Println("ga di wait")
+
+	// Receive results from channels if found
+	if found {
+		for res := range resultChan {
+			hasil = append(hasil, res...)
+		}
+
+		for vis := range visitChan {
+			visit = append(visit, vis...)
 		}
 	}
 

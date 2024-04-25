@@ -2,6 +2,7 @@ package logic
 
 import (
 	"fmt"
+	"sync"
 )
 
 type Node struct {
@@ -62,4 +63,31 @@ func getPathIDS(node *NodeIDS) []string {
 		node = node.parent
 	}
 	return reverse(path)
+}
+
+// SafeTitleVisited is a thread-safe map to keep track of visited titles
+type SafeTitleVisited struct {
+	mu     sync.Mutex
+	titles map[string]bool
+}
+
+// NewSafeTitleVisited creates a new instance of SafeTitleVisited
+func NewSafeTitleVisited() *SafeTitleVisited {
+	return &SafeTitleVisited{
+		titles: make(map[string]bool),
+	}
+}
+
+// MarkVisited marks a title as visited
+func (stv *SafeTitleVisited) MarkVisited(title string) {
+	stv.mu.Lock()
+	defer stv.mu.Unlock()
+	stv.titles[title] = true
+}
+
+// HasVisited checks if a title has been visited
+func (stv *SafeTitleVisited) HasVisited(title string) bool {
+	stv.mu.Lock()
+	defer stv.mu.Unlock()
+	return stv.titles[title]
 }

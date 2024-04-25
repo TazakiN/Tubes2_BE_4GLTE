@@ -27,12 +27,7 @@ func getPageTitle(url string) string {
 	return title
 }
 
-// var collyMutex sync.Mutex
-
 func getAllATag(url string) []map[string]string {
-	// collyMutex.Lock()
-	// defer collyMutex.Unlock()
-
 	c := colly.NewCollector()
 
 	links := []map[string]string{}
@@ -49,7 +44,7 @@ func getAllATag(url string) []map[string]string {
 			return // skip berkas, templat, istimewa, portal, bantuan, kategori, wikipedia:
 		}
 
-		if strings.Contains(href, "File:") || strings.Contains(title, "Template:") || strings.Contains(href, "Special:") || strings.Contains(href, "Portal:") || strings.Contains(href, "Bantuan:") || strings.Contains(href, "Category:") {
+		if strings.Contains(href, "File:") || strings.Contains(title, "Template:") || strings.Contains(href, "Special:") || strings.Contains(href, "Portal:") || strings.Contains(href, "Template_talk:") || strings.Contains(href, "Category:") {
 			return // skip berkas, templat, istimewa, portal, bantuan, kategori, wikipedia:
 		}
 
