@@ -1,14 +1,19 @@
-FROM golang:1.22.1-bookworm
+# Use an efficient base image 
+FROM golang:alpine 
 
+# Working directory for your app
 WORKDIR /app
 
-COPY go.mod ./
+# Copy dependencies
+COPY go.mod go.sum ./
+
 RUN go mod download
 
-COPY *.go ./
+# Copy source code
+COPY . .
 
-RUN go build -o /be-4GLTE-docker
+# Build the executable
+RUN go build -o /app/backend 
 
-EXPOSE 3321
-
-CMD [ "/be-4GLTE-docker" ]
+# Command to run the container
+CMD [ "/app/backend" ]
