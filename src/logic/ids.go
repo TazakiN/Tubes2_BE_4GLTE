@@ -170,9 +170,12 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 		fmt.Printf("Found? %t\n", found)
 		fmt.Printf("Depth %d\n", depth)
 
+		if found {
+			break
+		}
+
 		// Check if depth limit is reached
 		if node.depth > depth {
-			fmt.Println("error sini")
 			continue // Skip expanding this node further
 		}
 
@@ -215,7 +218,7 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 					hasil = append(hasil, getPathIDS(nodeAkhir))
 
 					found = true
-
+					close(queue)
 					break
 				}
 
