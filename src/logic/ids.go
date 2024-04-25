@@ -9,36 +9,35 @@ import (
 	"time"
 )
 
-func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) ([][]string, [][]string) {
+func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) [][]string {
 	// Create a slice to store the result
 	hasil := [][]string{}
-	visit := [][]string{}
 
 	//Check starting page
-	hasil, visit = DLSLevelZero(linkMulai, linkTujuan, bahasa)
+	hasil = DLSLevelZero(linkMulai, linkTujuan, bahasa)
 
 	// If the destination is found, return the result
 	if len(hasil) > 0 {
-		return hasil, visit
+		return hasil
 	}
 
 	// Loop through increasing depth limits
 	for depth := 1; depth <= maxDepth; depth++ {
 		// Perform depth-limited search with current depth limit
-		hasil, visit = DLS(linkMulai, linkTujuan, bahasa, depth)
+		hasil = DLS(linkMulai, linkTujuan, bahasa, depth)
 
 		// If the destination is found, return the result
 		if len(hasil) > 0 {
-			return hasil, visit
+			return hasil
 		}
 	}
 
 	// Return empty result if destination not found within max depth
 	fmt.Println("Not found! Try searching deeper")
-	return hasil, visit
+	return hasil
 }
 
-func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) ([][]string, [][]string) {
+func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) [][]string {
 	// Get the title of the starting page
 	titleMulai := getPageTitle(linkMulai)
 
@@ -68,7 +67,7 @@ func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) ([][]strin
 
 	// If the starting and destination titles are the same, return the link
 	if titleMulai == titleTujuan {
-		return append(hasil, []string{linkMulai}), visit
+		return append(hasil, []string{linkMulai})
 	}
 
 	aTags := getAllATag(start.link)
@@ -103,14 +102,10 @@ func DLSLevelZero(linkMulai string, linkTujuan string, bahasa string) ([][]strin
 	}
 
 	// Return the result
-	return hasil, visit
+	return hasil
 }
 
-func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]string, [][]string) {
-	// Create channels for results
-	//resultChan := make(chan [][]string)
-	//visitChan := make(chan [][]string)
-
+func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) [][]string {
 	// Create a stack for the queue
 	queue := make(chan *NodeIDS, int(math.Pow(2, 24)))
 
@@ -122,7 +117,6 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 
 	// Create a slice to store the result
 	hasil := [][]string{}
-	visit := [][]string{}
 
 	// Create a map to keep track of visited titles
 	titleVisited := NewSafeTitleVisited()
@@ -205,8 +199,6 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 					continue
 				}
 
-				visit = append(visit, []string{node.title})
-
 				// Check if the destination title is found
 				if title == titleTujuan {
 					// Create a new node for the destination
@@ -248,7 +240,7 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) ([][]str
 	// }
 
 	// Return empty result if destination not found within depth limit
-	return hasil, visit
+	return hasil
 }
 
 // Function signature for DLS:
