@@ -170,7 +170,7 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) [][]stri
 
 		// Check if depth limit is reached
 		if node.depth > depth {
-			continue // Skip expanding this node further
+			break // Skip expanding this node further
 		}
 
 		time.Sleep(time.Duration(rand.IntN(21)) * time.Millisecond)
@@ -218,10 +218,12 @@ func DLS(linkMulai string, linkTujuan string, bahasa string, depth int) [][]stri
 				titleVisited.MarkVisited(title)
 
 				if !found {
-					// Enqueue the new node
-					n := newNodeIDS(link, title, nodeToProcess.depth+1) // Increment depth
-					n.parent = nodeToProcess
-					queue <- n
+					if nodeToProcess.depth < depth {
+						// Enqueue the new node
+						n := newNodeIDS(link, title, nodeToProcess.depth+1) // Increment depth
+						n.parent = nodeToProcess
+						queue <- n
+					}
 				}
 			}
 		}(node)
