@@ -21,7 +21,7 @@ func main() {
 
 	router.GET("/:bahasa/:metode/:linkMulai/:linkTujuan/:kedalaman", getData)
 
-	router.Run("localhost:3321")
+	router.Run(":3321")
 }
 
 func getData(c *gin.Context) {
