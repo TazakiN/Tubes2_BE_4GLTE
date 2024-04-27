@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	logic "github.com/TazakiN/Tubes2_BE_4GLTE/logic"
@@ -19,7 +18,7 @@ func main() {
 
 	router.Use(cors.New(config))
 
-	router.GET("/:bahasa/:metode/:linkMulai/:linkTujuan/:kedalaman", getData)
+	router.GET("/:bahasa/:metode/:linkMulai/:linkTujuan/", getData)
 
 	router.Run(":3321")
 }
@@ -29,8 +28,6 @@ func getData(c *gin.Context) {
 	metode := c.Param("metode")
 	linkMulai := c.Param("linkMulai")
 	linkTujuan := c.Param("linkTujuan")
-	kedalamanStr := c.Param("kedalaman")
-	kedalaman, _ := strconv.Atoi(kedalamanStr)
 	hasil := [][]string{}
 	visit := [][]string{}
 
@@ -38,7 +35,7 @@ func getData(c *gin.Context) {
 	if metode == "BFS" {
 		hasil = logic.BFS(linkMulai, linkTujuan, bahasa)
 	} else if metode == "IDS" {
-		hasil = logic.IDS(linkMulai, linkTujuan, bahasa, kedalaman)
+		hasil = logic.IDS(linkMulai, linkTujuan, bahasa)
 	}
 	endTime := time.Now()
 	elapseTime := endTime.Sub(startTime).String()
