@@ -18,7 +18,7 @@ func main() {
 
 	router.Use(cors.New(config))
 
-	router.GET("/:bahasa/:metode/:linkMulai/:linkTujuan/", getData)
+	router.GET("/:bahasa/:metode/:linkMulai/:linkTujuan", getData)
 
 	router.Run(":3321")
 }
