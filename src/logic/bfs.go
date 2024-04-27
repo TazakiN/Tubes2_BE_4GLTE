@@ -151,6 +151,10 @@ func BFS(linkMulai string, linkTujuan string, bahasa string) [][]string {
 				}
 			}
 		}(node)
+
+		if len(queue) == 0 {
+			wg.Wait()
+		}
 	}
 
 	//close(queue)
