@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) [][]string {
+func IDS(linkMulai string, linkTujuan string, bahasa string) [][]string {
 	// Create a slice to store the result
 	hasil := [][]string{}
 
@@ -21,19 +21,21 @@ func IDS(linkMulai string, linkTujuan string, bahasa string, maxDepth int) [][]s
 		return hasil
 	}
 
+	depth := 1
+	found := false
 	// Loop through increasing depth limits
-	for depth := 1; depth <= maxDepth; depth++ {
+	for !found {
 		// Perform depth-limited search with current depth limit
 		hasil = DLS(linkMulai, linkTujuan, bahasa, depth)
 
 		// If the destination is found, return the result
 		if len(hasil) > 0 {
-			return hasil
+			found = true
+		} else {
+			depth++
 		}
 	}
 
-	// Return empty result if destination not found within max depth
-	fmt.Println("Not found! Try searching deeper")
 	return hasil
 }
 
